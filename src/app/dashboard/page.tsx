@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 export default async function Dashboard() {
   const session = await auth();
   if (!session) redirect("/login");
-  console.log(session);
   const userName = session.user?.name
     ? session.user?.name
     : `${session.user?.first_name} ${session.user?.last_name}`;

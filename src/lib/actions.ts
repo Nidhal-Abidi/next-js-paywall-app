@@ -1,38 +1,62 @@
 import db from "./db";
-import { executeAction } from "./executeAction";
 import { userSignupSchema } from "./schemas/userSignup.schema";
 import bcrypt from "bcrypt";
 
 export const signUp = async (formData: FormData) => {
-  return executeAction({
-    actionFn: async () => {
-      const email = formData.get("email");
-      const password = formData.get("password");
-      const firstName = formData.get("firstName");
-      const lastName = formData.get("lastName");
+  try {
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const firstName = formData.get("firstName");
+    const lastName = formData.get("lastName");
 
-      const validatedData = userSignupSchema.parse({
-        email,
-        password,
-        firstName,
-        lastName,
-      });
+    // Validate the input data
+    const validatedData = userSignupSchema.parse({
+      email,
+      password,
+      firstName,
+      lastName,
+    });
 
-      const saltRounds = 12;
-      const passwordHash = await bcrypt.hash(
-        validatedData.password!,
-        saltRounds
-      );
+    // Check if user already exists
+    const existingUser = await db.user.findFirst({
+      where: {
+        email: validatedData.email.toLowerCase(),
+      },
+    });
 
-      await db.user.create({
-        data: {
-          first_name: validatedData.firstName,
-          last_name: validatedData.lastName,
-          email: validatedData.email.toLocaleLowerCase(),
-          password: passwordHash,
-        },
-      });
-    },
-    successMessage: "Signed up successfully",
-  });
+    if (existingUser) {
+      return { success: false, error: "UserExists" };
+    }
+
+    // Hash the password
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(validatedData.password!, saltRounds);
+
+    // Create the user
+    await db.user.create({
+      data: {
+        first_name: validatedData.firstName,
+        last_name: validatedData.lastName,
+        email: validatedData.email.toLowerCase(),
+        password: passwordHash,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("SignUp error:", error);
+
+    // Handle Zod validation errors
+    if (error.name === "ZodError") {
+      return { success: false, error: "ValidationError" };
+    }
+
+    // Handle Prisma unique constraint errors (duplicate email)
+    if (error.code === "P2002") {
+      return { success: false, error: "UserExists" };
+    }
+
+    // Handle other database errors
+    return { success: false, error: "DatabaseError" };
+  }
 };

@@ -20,35 +20,55 @@ export const { handlers, auth, signIn } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        const validatedCredentials = userLoginSchema.parse(credentials);
+        try {
+          const validatedCredentials = userLoginSchema.parse(credentials);
 
-        const user = await db.user.findFirst({
-          where: {
-            email: validatedCredentials.email,
-          },
-        });
-        if (!user) throw new Error("Invalid Credentials");
+          const user = await db.user.findFirst({
+            where: {
+              email: validatedCredentials.email,
+            },
+          });
 
-        const isValid = await bcrypt.compare(
-          validatedCredentials.password,
-          user.password!
-        );
-        if (!isValid) {
-          throw new Error("Invalid credentials");
+          if (!user) {
+            return null;
+          }
+
+          const isValid = await bcrypt.compare(
+            validatedCredentials.password,
+            user.password!
+          );
+
+          if (!isValid) {
+            return null;
+          }
+
+          // Strip out hash before returning
+          const { password, ...safeUser } = user;
+          return safeUser;
+        } catch (error) {
+          console.error("Authorization error:", error);
+          return null;
         }
-
-        // 3) strip out hash before returning
-        const { password, ...safeUser } = user;
-        return safeUser;
       },
     }),
   ],
+  pages: {
+    signIn: "/login", // Redirect to your custom login page
+    error: "/login", // Redirect errors to login page with error parameter
+  },
   callbacks: {
     async jwt({ token, account }) {
       if (account?.provider === "credentials") {
         token.credentials = true;
       }
       return token;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
   jwt: {

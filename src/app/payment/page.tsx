@@ -7,7 +7,6 @@ export default async function Payment() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  console.log(session);
   const hasSubscription = session.user?.has_subscription || false;
 
   return (

@@ -6,7 +6,6 @@ export async function PATCH(request: NextRequest) {
   try {
     // Get the current session
     const session = await auth();
-    console.log(session?.user);
 
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
