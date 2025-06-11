@@ -1,6 +1,7 @@
 import db from "./db";
 import { executeAction } from "./executeAction";
 import { userSignupSchema } from "./schemas/userSignup.schema";
+import bcrypt from "bcrypt";
 
 export const signUp = async (formData: FormData) => {
   return executeAction({
@@ -16,12 +17,19 @@ export const signUp = async (formData: FormData) => {
         firstName,
         lastName,
       });
+
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(
+        validatedData.password!,
+        saltRounds
+      );
+
       await db.user.create({
         data: {
           first_name: validatedData.firstName,
           last_name: validatedData.lastName,
           email: validatedData.email.toLocaleLowerCase(),
-          password: validatedData?.password,
+          password: passwordHash,
         },
       });
     },
