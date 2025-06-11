@@ -1,7 +1,6 @@
 import Navbar from "@/components/NavBar";
 import { auth } from "@/lib/auth";
 import { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -20,7 +19,7 @@ export default async function Dashboard() {
     <>
       <Navbar />
       <div className="text-center">
-        <div className="mb-4 p-16 border-gray-400 border-b">
+        <div className="mb-4 p-16 ">
           <h1 className="text-xl font-bold mb-4 tracking-tight">
             Look who is back,{" "}
             <span className="underline decoration-wavy bg-gray-100 p-2 rounded italic">
@@ -35,21 +34,6 @@ export default async function Dashboard() {
             </span>
           </p>
         </div>
-
-        <p className="text-lg mb-8">Ready to enhance your journey?</p>
-        <Link
-          href="/premium"
-          className="
-                inline-block 
-                px-8 py-4 
-                border-2 border-black 
-                hover:bg-black hover:text-white
-                transition-all duration-300
-                 font-semibold
-              "
-        >
-          Explore Premium Features →
-        </Link>
       </div>
     </>
   );

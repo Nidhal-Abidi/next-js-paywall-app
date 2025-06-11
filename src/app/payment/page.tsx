@@ -1,7 +1,7 @@
 import Navbar from "@/components/NavBar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import SubscriptionButton from "@/components/SubscriptionButton";
+import CheckoutPageWrapper from "@/components/CheckoutPageWrapper";
 
 export default async function Payment() {
   const session = await auth();
@@ -28,10 +28,9 @@ export default async function Payment() {
         >
           {hasSubscription
             ? "You're already subscribed! 🥳"
-            : "You want to enjoy our premium features? Click on this button..."}
+            : "You want to enjoy our premium features? Fill out the form below. Provided by Stripe..."}
         </p>
-
-        <SubscriptionButton hasSubscription={hasSubscription} />
+        {!hasSubscription ? <CheckoutPageWrapper /> : ""}
       </div>
     </>
   );
