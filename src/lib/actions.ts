@@ -1,4 +1,7 @@
+"use server";
+import { getSubscriptionPrice } from "@/utils/constants";
 import db from "./db";
+import { paymentFormSchema } from "./schemas/paymentForm.schema";
 import { userSignupSchema } from "./schemas/userSignup.schema";
 import bcrypt from "bcrypt";
 
@@ -55,3 +58,24 @@ export const signUp = async (formData: FormData) => {
     return { success: false, error: "DatabaseError" };
   }
 };
+
+export async function submitPayment(formData: FormData) {
+  const data = {
+    cardNumber: formData.get("cardNumber") as string,
+    expirationMonth: formData.get("expirationMonth") as string,
+    expirationYear: formData.get("expirationYear") as string,
+    cvc: formData.get("cvc") as string,
+    cardHolderName: formData.get("cardHolderName") as string,
+    subscriptionTier: formData.get("subscriptionTier") as string,
+  };
+  const result = paymentFormSchema.safeParse(data);
+  if (!result.success) {
+    console.log(result.error.format());
+    return;
+  }
+  const newData = {
+    ...result.data,
+    subscriptionPrice: getSubscriptionPrice(data.subscriptionTier),
+  };
+  console.log(newData);
+}

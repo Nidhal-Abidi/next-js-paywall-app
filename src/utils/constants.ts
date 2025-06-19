@@ -133,3 +133,16 @@ export type Tier = {
   price: "€10" | "€20" | "€30";
   features: string[];
 };
+
+export const getSubscriptionPrice = (tierId: string) => {
+  switch (tierId) {
+    case "bronze":
+      return 10;
+    case "silver":
+      return 20;
+    case "gold":
+      return 30;
+    default:
+      return 0;
+  }
+};
