@@ -4,11 +4,8 @@ export function CardHolderName() {
   const [name, setName] = useState("");
 
   // validation: at least two words (first + last name)
-  const parts = name
-    .trim()
-    .split(/\s+/)
-    .filter((p) => p.length > 0);
-  const isValid = parts.length >= 2;
+  const trimmed = name.trim();
+  const isValid = /^[A-Za-z]+ +[A-Za-z]+$/.test(trimmed);
   const showError = name.length > 0 && !isValid;
 
   return (
@@ -37,7 +34,7 @@ export function CardHolderName() {
       />
       {showError && (
         <p className="mt-1 text-sm text-red-600">
-          You must include your First and Last name!
+          You must include your First and Last name (letters only)!
         </p>
       )}
       {isValid && <p className="mt-1 text-sm text-green-600">✓ Looks good</p>}

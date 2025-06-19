@@ -29,7 +29,6 @@ export default async function Payment() {
             ? "You're already subscribed! 🥳"
             : "You want to enjoy our premium features? Pay for one of our 3 subscription tiers by providing your details below!"}
         </p>
-        {/* {!hasSubscription ? <CheckoutPageWrapper /> : ""} */}
       </div>
       <PaymentForm />
     </>

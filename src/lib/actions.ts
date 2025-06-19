@@ -70,12 +70,13 @@ export async function submitPayment(formData: FormData) {
   };
   const result = paymentFormSchema.safeParse(data);
   if (!result.success) {
-    console.log(result.error.format());
-    return;
+    const { fieldErrors } = result.error.flatten();
+    return { success: false, errors: fieldErrors };
   }
   const newData = {
     ...result.data,
     subscriptionPrice: getSubscriptionPrice(data.subscriptionTier),
   };
   console.log(newData);
+  return { success: true };
 }

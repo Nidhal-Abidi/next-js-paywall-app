@@ -7,6 +7,7 @@ import { CardCvc } from "./CardCvc";
 import { CardHolderName } from "./CardHolderName";
 import { CardPaymentButton } from "./CardPaymentButton";
 import { CardExpirationDate } from "./CardExpirationDate";
+import { CreditCardErrors } from "./CreditCardErrors";
 
 export type CardDetails = {
   number: string;
@@ -17,9 +18,10 @@ export type CardDetails = {
 
 interface CreditCardProps {
   selectedTier: Tier | null;
+  errors: string[];
 }
 
-export function CreditCard({ selectedTier }: CreditCardProps) {
+export function CreditCard({ selectedTier, errors }: CreditCardProps) {
   return (
     <>
       {selectedTier && (
@@ -40,15 +42,13 @@ export function CreditCard({ selectedTier }: CreditCardProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <CardNumber />
-
             <CardExpirationDate />
-
             <CardCvc />
-
             <CardHolderName />
           </div>
 
           <CardPaymentButton selectedTier={selectedTier} />
+          <CreditCardErrors errors={errors} />
         </div>
       )}
     </>

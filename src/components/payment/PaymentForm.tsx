@@ -8,6 +8,21 @@ import { submitPayment } from "@/lib/actions";
 
 export default function PaymentForm() {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  async function handleSubmit(formData: FormData) {
+    setErrors([]);
+
+    console.log("FormData entries:", [...formData.entries()]);
+
+    const res = await submitPayment(formData);
+    if (!res.success) {
+      // Flatten all field errors into a single array
+      const allErrors = Object.values(res.errors ?? {}).flat();
+      setErrors(allErrors);
+      return;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6">
@@ -18,7 +33,7 @@ export default function PaymentForm() {
         <p className="text-center text-gray-600 mb-12">
           One-time payment - No subscription
         </p>
-        <form action={submitPayment}>
+        <form action={handleSubmit}>
           {/* Tier Grid */}
           <SubscriptionTiers
             tiers={tiers}
@@ -26,7 +41,7 @@ export default function PaymentForm() {
             setSelectedTier={setSelectedTier}
           />
           {/* CreditCard Form */}
-          <CreditCard selectedTier={selectedTier} />
+          <CreditCard selectedTier={selectedTier} errors={errors} />
         </form>
       </div>
     </div>
