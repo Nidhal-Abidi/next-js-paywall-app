@@ -1,13 +1,13 @@
-import Navbar from "@/components/NavBar";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import CheckoutPageWrapper from "@/components/CheckoutPageWrapper";
+import Navbar from "@/components/navbar/NavBar";
+import PaymentForm from "@/components/payment/PaymentForm";
 
 export default async function Payment() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const hasSubscription = session.user?.has_subscription || false;
+  const hasSubscription = session.user?.subscription ? true : false;
 
   return (
     <>
@@ -27,10 +27,11 @@ export default async function Payment() {
         >
           {hasSubscription
             ? "You're already subscribed! 🥳"
-            : "You want to enjoy our premium features? Fill out the form below. Provided by Stripe..."}
+            : "You want to enjoy our premium features? Pay for one of our 3 subscription tiers by providing your details below!"}
         </p>
-        {!hasSubscription ? <CheckoutPageWrapper /> : ""}
+        {/* {!hasSubscription ? <CheckoutPageWrapper /> : ""} */}
       </div>
+      <PaymentForm />
     </>
   );
 }

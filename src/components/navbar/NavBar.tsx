@@ -6,7 +6,7 @@ import { NavItem } from "./NavItem";
 export default async function Navbar() {
   const session = await auth();
   if (!session) redirect("/login");
-  const hasSubscription = session.user?.has_subscription || false;
+  const hasSubscription = session.user?.subscription ? true : false;
 
   const links = [
     { url: "/dashboard", routeName: "Dashboard", isActive: true },

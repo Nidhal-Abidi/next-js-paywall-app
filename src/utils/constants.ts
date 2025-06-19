@@ -94,3 +94,42 @@ I am confident that my academic background, dedication to [field], and [personal
 Sincerely,
 [Your Name]
 `;
+
+export const tiers: Tier[] = [
+  {
+    id: "bronze",
+    name: "Bronze",
+    price: "€10",
+    features: [
+      "Access to Document Templates page",
+      "Download multiple visa application templates",
+    ],
+  },
+  {
+    id: "silver",
+    name: "Silver",
+    price: "€20",
+    features: [
+      "Everything in Bronze +",
+      "Access to the page Embassy Information Hub",
+      "This includes: Embassy/consulate details, Appointment booking tips and Processing times & contact info",
+    ],
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    price: "€30",
+    features: [
+      "Everything in Bronze +",
+      "Access to the page Consultation Booking",
+      "This includes: 1-on-1 consultation booking and Personal visa expert sessions",
+    ],
+  },
+];
+
+export type Tier = {
+  id: "bronze" | "silver" | "gold";
+  name: "Bronze" | "Silver" | "Gold";
+  price: "€10" | "€20" | "€30";
+  features: string[];
+};

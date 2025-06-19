@@ -57,6 +57,19 @@ export const { handlers, auth, signIn } = NextAuth({
     error: "/login", // Redirect errors to login page with error parameter
   },
   callbacks: {
+    async session({ session, user }) {
+      if (user?.id) {
+        // Fetch user's subscription from database
+        const subscription = await db.subscription.findUnique({
+          where: { userId: user.id },
+        });
+
+        // Add subscription data to session
+        session.user.id = user.id;
+        session.user.subscription = subscription || undefined;
+      }
+      return session;
+    },
     async jwt({ token, account }) {
       if (account?.provider === "credentials") {
         token.credentials = true;

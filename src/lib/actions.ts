@@ -35,8 +35,8 @@ export const signUp = async (formData: FormData) => {
     // Create the user
     await db.user.create({
       data: {
-        first_name: validatedData.firstName,
-        last_name: validatedData.lastName,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
         email: validatedData.email.toLowerCase(),
         password: passwordHash,
       },
@@ -49,11 +49,6 @@ export const signUp = async (formData: FormData) => {
     // Handle Zod validation errors
     if (error.name === "ZodError") {
       return { success: false, error: "ValidationError" };
-    }
-
-    // Handle Prisma unique constraint errors (duplicate email)
-    if (error.code === "P2002") {
-      return { success: false, error: "UserExists" };
     }
 
     // Handle other database errors

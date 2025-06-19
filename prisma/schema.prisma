@@ -11,24 +11,24 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  name             String?
-  first_name       String?
-  last_name        String?
-  email            String?         @unique
-  emailVerified    DateTime?
-  password         String?
-  has_subscription Boolean         @default(false)
-  image            String?
-  accounts         Account[]
-  sessions         Session[]
+  id            String          @id @default(cuid())
+  name          String?
+  firstName     String?
+  lastName      String?
+  email         String?         @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
   // Optional for WebAuthn support
-  Authenticator    Authenticator[]
+  Authenticator Authenticator[]
 
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  Payment      Payment[]
-  Consultation Consultation[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  consultations Consultation[]
+  subscription  Subscription?
+  transactions  Transaction[]
 }
 
 model Account {
@@ -88,24 +88,48 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
-model Payment {
-  id         String   @id @default(uuid())
-  paid_price Int
-  user_id    String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model Consultation {
+  id            String           @id @default(cuid())
+  userId        String
+  type          ConsultationType
+  preferredDate DateTime
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
-  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Consultation {
-  id             String   @id @default(uuid())
-  user_id        String?
-  type           String // document-review, visa-application-guidance, interview-preparation 
-  preferred_data DateTime
-  status         String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  planType  PlanType
+  amount    Int
+  currency  String   @default("EUR")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  planType  PlanType
+  amount    Int
+  currency  String   @default("EUR")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum PlanType {
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum ConsultationType {
+  DOCUMENT_REVIEW
+  VISA_APPLICATION_GUIDANCE
+  INTERVIEW_PREPARATION
 }

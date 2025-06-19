@@ -1,4 +1,4 @@
-import Navbar from "@/components/NavBar";
+import Navbar from "@/components/navbar/NavBar";
 import { auth } from "@/lib/auth";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -12,7 +12,7 @@ export default async function Dashboard() {
   if (!session) redirect("/login");
   const userName = session.user?.name
     ? session.user?.name
-    : `${session.user?.first_name} ${session.user?.last_name}`;
+    : `${session.user?.firstName} ${session.user?.lastName}`;
 
   return (
     <>

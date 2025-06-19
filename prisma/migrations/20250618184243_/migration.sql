@@ -1,16 +1,17 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "email" TEXT,
+    "emailVerified" DATETIME,
+    "password" TEXT,
+    "image" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
 
-  - You are about to drop the column `created_at` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `first_name` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `has_subscription` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `is_admin` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `last_name` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `password` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `updated_at` on the `User` table. All the data in the column will be lost.
-  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -63,24 +64,42 @@ CREATE TABLE "Authenticator" (
     CONSTRAINT "Authenticator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- RedefineTables
-PRAGMA defer_foreign_keys=ON;
-PRAGMA foreign_keys=OFF;
-CREATE TABLE "new_User" (
+-- CreateTable
+CREATE TABLE "Consultation" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "name" TEXT,
-    "email" TEXT,
-    "emailVerified" DATETIME,
-    "image" TEXT,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "preferredDate" DATETIME NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Consultation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO "new_User" ("email", "id") SELECT "email", "id" FROM "User";
-DROP TABLE "User";
-ALTER TABLE "new_User" RENAME TO "User";
+
+-- CreateTable
+CREATE TABLE "Subscription" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "planType" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'EUR',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Subscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Transaction" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "planType" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'EUR',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-PRAGMA foreign_keys=ON;
-PRAGMA defer_foreign_keys=OFF;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
@@ -93,3 +112,6 @@ CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationTok
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Authenticator_credentialID_key" ON "Authenticator"("credentialID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Subscription_userId_key" ON "Subscription"("userId");
