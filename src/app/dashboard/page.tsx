@@ -1,18 +1,17 @@
 import Navbar from "@/components/navbar/NavBar";
-import { auth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth-utils";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Dashboard ",
 };
 
 export default async function Dashboard() {
-  const session = await auth();
-  if (!session) redirect("/login");
-  const userName = session.user?.name
-    ? session.user?.name
-    : `${session.user?.firstName} ${session.user?.lastName}`;
+  const session = await requireAuth();
+
+  const userName = session.user.name
+    ? session.user.name
+    : `${session.user.firstName} ${session.user.lastName}`;
 
   return (
     <>
@@ -29,7 +28,7 @@ export default async function Dashboard() {
           <p className="text-xl text-gray-700">
             Logged in with{" "}
             <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-              {session.user?.email}
+              {session.user.email}
             </span>
           </p>
         </div>

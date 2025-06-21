@@ -1,24 +1,13 @@
 import { Template } from "@/components/Template";
+import { requireSubscription } from "@/lib/auth-utils";
 import {
   coverLetterTemplate,
   cvTemplate,
   motivationLetterTemplate,
 } from "@/utils/constants";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 
-export default function DocumentTemplates() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/login");
-    }
-    // Add check for a specific subscription tier, otherwhise redirect to `/payment`
-  }, [status, router, session]);
+export default async function DocumentTemplates() {
+  const session = await requireSubscription("BRONZE");
 
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">

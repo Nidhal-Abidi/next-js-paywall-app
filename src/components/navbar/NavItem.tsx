@@ -12,7 +12,7 @@ export function NavItem({
   return (
     <li>
       <Link
-        href={isActive ? url : "/payment"}
+        href={url}
         className={`text-gray-700 px-3 py-2 sm:px-4 sm:py-3 rounded transition duration-200 inline-block ${
           isActive
             ? "hover:text-white hover:bg-gray-500"

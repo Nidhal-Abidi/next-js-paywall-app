@@ -1,14 +1,30 @@
 "use client";
 
 import { Tier, tiers } from "@/utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreditCard } from "./creditCard/CreditCard";
 import { SubscriptionTiers } from "./SubscriptionTiers";
 import { submitPayment } from "@/lib/actions";
 
-export default function PaymentForm() {
+interface PaymentFormProps {
+  requiredPlan: string | undefined;
+  currentPlan: string | undefined;
+}
+
+export default function PaymentForm({
+  requiredPlan,
+  currentPlan,
+}: PaymentFormProps) {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Pre-select the requiredPlan if it exists
+    if (requiredPlan) {
+      const tier = tiers.find((t) => t.id === requiredPlan.toLowerCase());
+      setSelectedTier(tier || null);
+    }
+  }, [requiredPlan]);
 
   async function handleSubmit(formData: FormData) {
     setErrors([]);
@@ -39,6 +55,8 @@ export default function PaymentForm() {
             tiers={tiers}
             selectedTier={selectedTier}
             setSelectedTier={setSelectedTier}
+            requiredPlan={requiredPlan}
+            currentPlan={currentPlan}
           />
           {/* CreditCard Form */}
           <CreditCard selectedTier={selectedTier} errors={errors} />

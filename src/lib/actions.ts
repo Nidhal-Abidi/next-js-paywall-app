@@ -77,6 +77,7 @@ export async function submitPayment(formData: FormData) {
     ...result.data,
     subscriptionPrice: getSubscriptionPrice(data.subscriptionTier),
   };
+  // save it into the DB.
   console.log(newData);
   return { success: true };
 }

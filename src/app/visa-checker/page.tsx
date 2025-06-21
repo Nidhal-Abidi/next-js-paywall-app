@@ -1,24 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useState } from "react";
 import { VisaCheckerForm } from "@/components/visa-checker/VisaCheckerForm";
 import { VisaCheckerResult } from "@/components/visa-checker/VisaCheckerResult";
-import { useRouter } from "next/navigation";
 
 export default function VisaChecker() {
   const [requirements, setRequirements] = useState("");
   const [showResult, setShowResult] = useState(false);
-
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/login");
-    }
-  }, [status, router, session]);
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
