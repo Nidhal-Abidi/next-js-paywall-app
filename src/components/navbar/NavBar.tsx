@@ -18,6 +18,11 @@ export default async function Navbar() {
       isActive: hasSubscription,
     },
     {
+      url: "/premium/embassy-hub",
+      routeName: "Embassy Hub",
+      isActive: hasSubscription,
+    },
+    {
       url: "/premium/consultation-booking",
       routeName: "Book a Consultation",
       isActive: hasSubscription,
