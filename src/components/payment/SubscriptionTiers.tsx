@@ -19,17 +19,18 @@ export function SubscriptionTiers({
 }: SubscriptionTiersProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-      {tiers.map((tier, idx) => {
+      {tiers.map((tier) => {
         // Check if tier is current plan
         const isCurrentPlan = currentPlan === tier.id;
         const isDisabled = checkIfSubscriptionTierIsDisabled(
           tier.id,
-          requiredPlan
+          requiredPlan,
+          currentPlan
         );
 
         return (
           <SubscriptionTier
-            key={idx}
+            key={tier.id}
             selectedTier={selectedTier}
             setSelectedTier={setSelectedTier}
             tier={tier}
@@ -44,17 +45,25 @@ export function SubscriptionTiers({
 
 const checkIfSubscriptionTierIsDisabled = (
   tierId: "bronze" | "gold" | "silver",
-  requiredPlan: string | undefined
+  requiredPlan: string | undefined,
+  currentPlan: string | undefined
 ) => {
   const planHierarchy = {
     bronze: 1,
     silver: 2,
     gold: 3,
   };
-  const isDisabled = requiredPlan
-    ? planHierarchy[tierId] <
-      planHierarchy[requiredPlan as "bronze" | "gold" | "silver"]
-    : false;
+  if (
+    currentPlan &&
+    (tierId === currentPlan ||
+      planHierarchy[tierId] <
+        planHierarchy[currentPlan as "bronze" | "gold" | "silver"])
+  ) {
+    return true;
+  }
 
-  return isDisabled;
+  return requiredPlan
+    ? planHierarchy[tierId] <
+        planHierarchy[requiredPlan as "bronze" | "gold" | "silver"]
+    : false;
 };

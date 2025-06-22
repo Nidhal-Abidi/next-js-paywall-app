@@ -111,7 +111,7 @@ model Transaction {
 }
 
 enum PlanType {
-  SILVER
-  GOLD
-  PLATINUM
+  bronze
+  silver
+  gold
 }

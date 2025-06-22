@@ -186,15 +186,6 @@ export const supportTeam = [
   },
 ];
 
-export const processingTimes = [
-  { type: "Tourist Visa", time: "10-15 working days", complexity: "Low" },
-  { type: "Student Visa", time: "4-6 weeks", complexity: "Medium" },
-  { type: "Work Visa", time: "6-8 weeks", complexity: "Medium" },
-  { type: "Family Reunion", time: "8-12 weeks", complexity: "High" },
-  { type: "Business Visa", time: "5-10 working days", complexity: "Low" },
-  { type: "Medical Treatment", time: "2-3 weeks", complexity: "Medium" },
-];
-
 export const embassies = [
   {
     id: 1,

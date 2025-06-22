@@ -1,7 +1,3 @@
-export function convertToSubCurrency(amount: number, factor = 100) {
-  return Math.round(amount * factor);
-}
-
 export function getRegisterPageErrorMessage(error: string) {
   switch (error) {
     case "UserExists":

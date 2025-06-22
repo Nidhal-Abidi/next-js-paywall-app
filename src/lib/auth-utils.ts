@@ -10,9 +10,8 @@ export async function requireAuth() {
   return session;
 }
 
-// Check subscription level
 export async function requireSubscription(
-  requiredPlan: "BRONZE" | "SILVER" | "GOLD"
+  requiredPlan: "bronze" | "silver" | "gold"
 ) {
   const session = await requireAuth();
 
@@ -21,15 +20,14 @@ export async function requireSubscription(
   }
 
   const userPlan = session.user.subscription.planType as
-    | "BRONZE"
-    | "SILVER"
-    | "GOLD";
+    | "bronze"
+    | "silver"
+    | "gold";
 
-  // Define plan hierarchy
   const planHierarchy = {
-    BRONZE: 1,
-    SILVER: 2,
-    GOLD: 3,
+    bronze: 1,
+    silver: 2,
+    gold: 3,
   };
 
   if (planHierarchy[userPlan] < planHierarchy[requiredPlan]) {

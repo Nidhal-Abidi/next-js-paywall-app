@@ -1,4 +1,4 @@
-import { Template } from "@/components/Template";
+import { Template } from "@/components/document-templates/Template";
 import { requireSubscription } from "@/lib/auth-utils";
 import {
   coverLetterTemplate,
@@ -7,7 +7,7 @@ import {
 } from "@/utils/constants";
 
 export default async function DocumentTemplates() {
-  await requireSubscription("BRONZE");
+  await requireSubscription("bronze");
 
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">

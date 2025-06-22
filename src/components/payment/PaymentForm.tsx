@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { CreditCard } from "./creditCard/CreditCard";
 import { SubscriptionTiers } from "./SubscriptionTiers";
 import { submitPayment } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface PaymentFormProps {
   requiredPlan: string | undefined;
@@ -17,19 +19,21 @@ export default function PaymentForm({
 }: PaymentFormProps) {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
+  const router = useRouter();
+  const { update } = useSession();
 
   useEffect(() => {
     // Pre-select the requiredPlan if it exists
     if (requiredPlan) {
       const tier = tiers.find((t) => t.id === requiredPlan.toLowerCase());
       setSelectedTier(tier || null);
+    } else {
+      setSelectedTier(null);
     }
   }, [requiredPlan]);
 
   async function handleSubmit(formData: FormData) {
     setErrors([]);
-
-    console.log("FormData entries:", [...formData.entries()]);
 
     const res = await submitPayment(formData);
     if (!res.success) {
@@ -38,6 +42,8 @@ export default function PaymentForm({
       setErrors(allErrors);
       return;
     }
+    await update();
+    router.push("/payment");
   }
 
   return (
@@ -50,7 +56,6 @@ export default function PaymentForm({
           One-time payment - No subscription
         </p>
         <form action={handleSubmit}>
-          {/* Tier Grid */}
           <SubscriptionTiers
             tiers={tiers}
             selectedTier={selectedTier}
@@ -58,7 +63,13 @@ export default function PaymentForm({
             requiredPlan={requiredPlan}
             currentPlan={currentPlan}
           />
-          {/* CreditCard Form */}
+          {selectedTier && (
+            <input
+              type="hidden"
+              name="subscriptionTier"
+              value={selectedTier.id}
+            />
+          )}
           <CreditCard selectedTier={selectedTier} errors={errors} />
         </form>
       </div>

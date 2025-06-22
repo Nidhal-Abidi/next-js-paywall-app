@@ -4,6 +4,7 @@ import db from "./db";
 import { paymentFormSchema } from "./schemas/paymentForm.schema";
 import { userSignupSchema } from "./schemas/userSignup.schema";
 import bcrypt from "bcrypt";
+import { requireAuth } from "./auth-utils";
 
 export const signUp = async (formData: FormData) => {
   try {
@@ -77,7 +78,36 @@ export async function submitPayment(formData: FormData) {
     ...result.data,
     subscriptionPrice: getSubscriptionPrice(data.subscriptionTier),
   };
-  // save it into the DB.
-  console.log(newData);
-  return { success: true };
+  try {
+    const session = await requireAuth();
+    // Create transaction
+    await db.transaction.create({
+      data: {
+        userId: session.user.id,
+        planType: newData.subscriptionTier,
+        amount: newData.subscriptionPrice,
+        currency: "EUR",
+      },
+    });
+
+    // Update/create subscription
+    await db.subscription.upsert({
+      where: { userId: session.user.id },
+      update: {
+        planType: newData.subscriptionTier,
+        amount: newData.subscriptionPrice,
+      },
+      create: {
+        userId: session.user.id,
+        planType: newData.subscriptionTier,
+        amount: newData.subscriptionPrice,
+        currency: "EUR",
+      },
+    });
+
+    return { success: true };
+  } catch (e) {
+    console.error("Payment processing failed:", e);
+    return { success: false, errors: e };
+  }
 }

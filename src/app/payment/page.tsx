@@ -1,19 +1,16 @@
 import Navbar from "@/components/navbar/NavBar";
 import PaymentForm from "@/components/payment/PaymentForm";
 import { requireAuth } from "@/lib/auth-utils";
+import { SessionProvider } from "next-auth/react";
 
 export default async function Payment({
   searchParams,
 }: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?: Promise<{ [key: string]: string | undefined }>;
 }) {
   const session = await requireAuth();
   const currentSearchParams = await searchParams;
-  const requiredPlan = currentSearchParams?.requiredPlan as
-    | "BRONZE"
-    | "SILVER"
-    | "GOLD"
-    | undefined;
+  const requiredPlan = currentSearchParams?.requiredPlan;
 
   const hasSubscription = !!session.user.subscription;
   const currentPlan = session.user.subscription?.planType;
@@ -24,7 +21,6 @@ export default async function Payment({
   return (
     <>
       <Navbar />
-
       <div
         className={`flex flex-col items-center justify-center rounded-lg border shadow-sm mt-6 p-6 ${
           hasSubscription && !requiredPlan
@@ -42,7 +38,9 @@ export default async function Payment({
           {message}
         </p>
       </div>
-      <PaymentForm requiredPlan={requiredPlan} currentPlan={currentPlan} />
+      <SessionProvider>
+        <PaymentForm requiredPlan={requiredPlan} currentPlan={currentPlan} />
+      </SessionProvider>
     </>
   );
 }
@@ -53,9 +51,9 @@ const getUserMessage = (
   currentPlan: string | undefined
 ) => {
   if (hasSubscription && requiredPlan) {
-    return `Your current ${currentPlan} plan doesn't include this feature. Upgrade to ${requiredPlan} or higher!`;
+    return `Your current ${currentPlan?.toUpperCase()} plan doesn't include this feature. Upgrade to ${requiredPlan?.toUpperCase()} or higher!`;
   } else if (requiredPlan) {
-    return `To access this content, you need at least the ${requiredPlan} subscription.`;
+    return `To access this content, you need at least the ${requiredPlan?.toUpperCase()} subscription.`;
   } else if (hasSubscription) {
     return "You're already subscribed! 🥳";
   } else {

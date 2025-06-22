@@ -39,10 +39,9 @@ export function SubscriptionTier({
       <input
         type="radio"
         id={`tier-${tier.id}`}
-        name="subscriptionTier"
         value={tier.id}
         className="sr-only"
-        checked={isSelected}
+        defaultChecked={selectedTier?.id === tier.id}
         disabled={disabled}
         onChange={() => !disabled && setSelectedTier(tier)}
       />

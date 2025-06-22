@@ -8,24 +8,29 @@ export default async function Navbar() {
   if (!session) redirect("/login");
   const hasSubscription = session.user?.subscription ? true : false;
 
+  const userSubscriptionType =
+    session.user?.subscription?.planType.toLowerCase();
+
   const links = [
     { url: "/dashboard", routeName: "Dashboard", isActive: true },
-    { url: "/visa-checker", routeName: "Visa Checker", isActive: true },
     { url: "/payment", routeName: "Pay", isActive: true },
     {
       url: "/premium/document-templates",
       routeName: "Document Templates",
-      isActive: hasSubscription,
+      isActive:
+        hasSubscription && isAvailablePage(userSubscriptionType, "bronze"),
     },
     {
       url: "/premium/embassy-hub",
       routeName: "Embassy Hub",
-      isActive: hasSubscription,
+      isActive:
+        hasSubscription && isAvailablePage(userSubscriptionType, "silver"),
     },
     {
       url: "/premium/consultation-booking",
       routeName: "Book a Consultation",
-      isActive: hasSubscription,
+      isActive:
+        hasSubscription && isAvailablePage(userSubscriptionType, "gold"),
     },
   ];
 
@@ -44,3 +49,19 @@ export default async function Navbar() {
     </nav>
   );
 }
+
+const isAvailablePage = (
+  userSubscriptionType: string | undefined,
+  requiredPlan: "bronze" | "silver" | "gold"
+) => {
+  const planHierarchy = {
+    bronze: 1,
+    silver: 2,
+    gold: 3,
+  };
+
+  return (
+    planHierarchy[userSubscriptionType as "bronze" | "silver" | "gold"] >=
+    planHierarchy[requiredPlan]
+  );
+};
