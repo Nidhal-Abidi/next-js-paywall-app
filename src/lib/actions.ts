@@ -51,7 +51,7 @@ export const signUp = async (formData: FormData) => {
     console.error("SignUp error:", error);
 
     // Handle Zod validation errors
-    if (error.name === "ZodError") {
+    if (error instanceof Error && error.name === "ZodError") {
       return { success: false, error: "ValidationError" };
     }
 

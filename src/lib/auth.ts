@@ -43,6 +43,7 @@ export const { handlers, auth, signIn } = NextAuth({
           }
 
           // Strip out hash before returning
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { password, ...safeUser } = user;
           return safeUser;
         } catch (error) {
