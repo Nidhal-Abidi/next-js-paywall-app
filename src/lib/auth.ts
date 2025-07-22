@@ -1,17 +1,18 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
-import { v4 as uuid } from "uuid";
 import db from "./db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { userLoginSchema } from "./schemas/userLogin.schema";
-import { encode } from "next-auth/jwt";
 import bcrypt from "bcrypt";
 
 const adapter = PrismaAdapter(db);
 
 export const { handlers, auth, signIn } = NextAuth({
   adapter,
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     GitHub,
     Credentials({
@@ -58,55 +59,30 @@ export const { handlers, auth, signIn } = NextAuth({
     error: "/login", // Redirect errors to login page with error parameter
   },
   callbacks: {
-    async session({ session, user }) {
-      if (user?.id) {
-        // Fetch user's subscription from database
+    async session({ session, token }) {
+      // For JWT sessions, user data comes from token
+      if (token?.sub) {
+        session.user.id = token.sub;
+
+        // Fetch subscription data
         const subscription = await db.subscription.findUnique({
-          where: { userId: user.id },
+          where: { userId: token.sub },
         });
 
-        // Add subscription data to session
-        session.user.id = user.id;
         session.user.subscription = subscription || undefined;
+        session.user.firstName = token.firstName || "";
+        session.user.lastName = token.lastName || "";
       }
       return session;
     },
-    async jwt({ token, account }) {
-      if (account?.provider === "credentials") {
-        token.credentials = true;
+    async jwt({ token, user, account }) {
+      // Store user data in token for credentials login
+      if (account?.provider === "credentials" && user) {
+        token.sub = user.id;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
       }
       return token;
-    },
-    async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    },
-  },
-  jwt: {
-    encode: async function (params) {
-      if (params.token?.credentials) {
-        const sessionToken = uuid();
-
-        if (!params.token.sub) {
-          throw new Error("No user ID found in token");
-        }
-
-        const createdSession = await adapter?.createSession?.({
-          sessionToken: sessionToken,
-          userId: params.token.sub,
-          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        });
-
-        if (!createdSession) {
-          throw new Error("Failed to create session");
-        }
-
-        return sessionToken;
-      }
-      return encode(params);
     },
   },
 });
